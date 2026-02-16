@@ -69,13 +69,16 @@ export async function analyzeSentence(
   sentence: string,
   settings: ApiSettings,
 ): Promise<AnalysisResult> {
-  const url = `${settings.baseUrl.replace(/\/+$/, '')}/v1/chat/completions`;
+  // Route through local Vite proxy to avoid CORS issues.
+  // The real target base URL is sent via X-Target-Base header.
+  const proxyUrl = '/api/proxy/v1/chat/completions';
 
-  const response = await fetch(url, {
+  const response = await fetch(proxyUrl, {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
       Authorization: `Bearer ${settings.apiKey}`,
+      'X-Target-Base': settings.baseUrl.replace(/\/+$/, ''),
     },
     body: JSON.stringify({
       model: settings.model,
