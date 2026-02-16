@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { ChevronRight, ChevronDown } from 'lucide-react';
 import type { ClauseNode } from '../types/analysis';
-import { roleColors } from '../utils/colors';
+import { getRoleColor } from '../utils/colors';
 
 interface TreeNodeProps {
   node: ClauseNode;
@@ -12,7 +12,7 @@ function TreeNode({ node, depth }: TreeNodeProps) {
   const [expanded, setExpanded] = useState(true);
   const hasChildren = node.children && node.children.length > 0;
 
-  const roleColor = node.role ? roleColors[node.role] : null;
+  const roleColor = node.role ? getRoleColor(node.role) : null;
   const borderColorClass = roleColor ? roleColor.border : 'border-stone-200';
 
   return (

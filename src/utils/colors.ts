@@ -24,6 +24,14 @@ export const roleEnglishLabels: Record<GrammarRole, string> = {
   punctuation: 'Punctuation',
 };
 
+export const defaultRoleColor = {
+  bg: 'bg-stone-100', text: 'text-stone-600', border: 'border-stone-300', label: '其他'
+};
+
+export function getRoleColor(role: string) {
+  return roleColors[role as GrammarRole] ?? defaultRoleColor;
+}
+
 export const posLabels: Record<string, string> = {
   noun: '名词',
   verb: '动词',

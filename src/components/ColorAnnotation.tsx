@@ -1,6 +1,6 @@
 import { useState, useRef, useEffect } from 'react';
 import type { TokenAnnotation, GrammarRole } from '../types/analysis';
-import { roleColors, posLabels } from '../utils/colors';
+import { getRoleColor, posLabels } from '../utils/colors';
 
 interface TooltipData {
   token: TokenAnnotation;
@@ -64,7 +64,7 @@ export default function ColorAnnotation({ tokens, translation, disabledRoles }: 
       {/* Annotated sentence */}
       <div className="font-serif-display text-lg md:text-xl leading-10 tracking-wide flex flex-wrap gap-1 items-baseline">
         {tokens.map((token, i) => {
-          const color = roleColors[token.role];
+          const color = getRoleColor(token.role);
           const disabled = disabledRoles?.has(token.role);
 
           if (token.role === 'punctuation') {
@@ -114,8 +114,8 @@ export default function ColorAnnotation({ tokens, translation, disabledRoles }: 
             <span>词性</span>
             <span className="text-stone-700 font-medium">{posLabels[tooltip.token.pos] ?? tooltip.token.pos}</span>
             <span>成分</span>
-            <span className={`font-medium ${roleColors[tooltip.token.role].text}`}>
-              {roleColors[tooltip.token.role].label}
+            <span className={`font-medium ${getRoleColor(tooltip.token.role).text}`}>
+              {getRoleColor(tooltip.token.role).label}
             </span>
           </div>
           <div className="bg-amber-50 text-amber-800 px-2 py-1 rounded text-sm">
