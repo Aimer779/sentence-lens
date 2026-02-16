@@ -1,25 +1,7 @@
 import { useState, useEffect } from 'react';
+import { X } from 'lucide-react';
 import type { ApiSettings } from '../types/analysis';
-
-const STORAGE_KEY = 'sentence-lens-settings';
-
-const DEFAULT_SETTINGS: ApiSettings = {
-  apiKey: '',
-  baseUrl: 'https://api.openai.com',
-  model: 'gpt-4o',
-};
-
-function loadSettings(): ApiSettings {
-  try {
-    const raw = localStorage.getItem(STORAGE_KEY);
-    if (raw) return { ...DEFAULT_SETTINGS, ...JSON.parse(raw) };
-  } catch { /* ignore */ }
-  return DEFAULT_SETTINGS;
-}
-
-function saveSettings(settings: ApiSettings) {
-  localStorage.setItem(STORAGE_KEY, JSON.stringify(settings));
-}
+import { saveSettings } from '../utils/settings';
 
 interface SettingsPanelProps {
   open: boolean;
@@ -44,68 +26,76 @@ export default function SettingsPanel({ open, onClose, settings, onSettingsChang
   if (!open) return null;
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center">
+    <div className="fixed inset-0 z-50">
       {/* Backdrop */}
-      <div className="absolute inset-0 bg-black/40" onClick={onClose} />
+      <div className="absolute inset-0 bg-stone-900/30 backdrop-blur-sm" onClick={onClose} />
 
       {/* Panel */}
-      <div className="relative bg-white rounded-xl shadow-2xl w-full max-w-md mx-4 p-6">
-        <h2 className="text-lg font-semibold text-gray-900 mb-4">API 设置</h2>
-
-        <div className="space-y-4">
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">API Key</label>
-            <input
-              type="password"
-              value={local.apiKey}
-              onChange={(e) => setLocal({ ...local, apiKey: e.target.value })}
-              placeholder="sk-..."
-              className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500"
-            />
+      <div className="absolute right-0 top-0 h-full w-full max-w-md bg-white shadow-2xl animate-slide-in-right overflow-y-auto">
+        <div className="p-6">
+          <div className="flex items-center justify-between mb-6">
+            <h2 className="text-lg font-semibold text-stone-800">API 设置</h2>
+            <button
+              onClick={onClose}
+              className="p-1.5 rounded-md text-stone-400 hover:text-stone-600 hover:bg-stone-100 transition-colors cursor-pointer"
+            >
+              <X size={20} />
+            </button>
           </div>
 
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">API Base URL</label>
-            <input
-              type="text"
-              value={local.baseUrl}
-              onChange={(e) => setLocal({ ...local, baseUrl: e.target.value })}
-              placeholder="https://api.openai.com"
-              className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500"
-            />
-            <p className="text-xs text-gray-400 mt-1">支持 OpenAI 兼容 API，如 https://api.openai.com</p>
+          <div className="space-y-5">
+            <div>
+              <label className="block text-sm font-medium text-stone-700 mb-1.5">API Key</label>
+              <input
+                type="password"
+                value={local.apiKey}
+                onChange={(e) => setLocal({ ...local, apiKey: e.target.value })}
+                placeholder="sk-..."
+                className="w-full px-3 py-2.5 bg-stone-50 border border-stone-200 rounded-lg text-sm focus:outline-none focus:bg-white focus:border-amber-500 transition-colors"
+              />
+            </div>
+
+            <div>
+              <label className="block text-sm font-medium text-stone-700 mb-1.5">API Base URL</label>
+              <input
+                type="text"
+                value={local.baseUrl}
+                onChange={(e) => setLocal({ ...local, baseUrl: e.target.value })}
+                placeholder="https://api.openai.com"
+                className="w-full px-3 py-2.5 bg-stone-50 border border-stone-200 rounded-lg text-sm focus:outline-none focus:bg-white focus:border-amber-500 transition-colors"
+              />
+              <p className="text-xs text-stone-400 mt-1.5">支持 OpenAI 兼容 API，如 https://api.openai.com</p>
+            </div>
+
+            <div>
+              <label className="block text-sm font-medium text-stone-700 mb-1.5">模型</label>
+              <input
+                type="text"
+                value={local.model}
+                onChange={(e) => setLocal({ ...local, model: e.target.value })}
+                placeholder="gpt-4o"
+                className="w-full px-3 py-2.5 bg-stone-50 border border-stone-200 rounded-lg text-sm focus:outline-none focus:bg-white focus:border-amber-500 transition-colors"
+              />
+              <p className="text-xs text-stone-400 mt-1.5">例如: gpt-4o, gpt-4o-mini, gpt-3.5-turbo</p>
+            </div>
           </div>
 
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">模型</label>
-            <input
-              type="text"
-              value={local.model}
-              onChange={(e) => setLocal({ ...local, model: e.target.value })}
-              placeholder="gpt-4o"
-              className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500"
-            />
-            <p className="text-xs text-gray-400 mt-1">例如: gpt-4o, gpt-4o-mini, gpt-3.5-turbo</p>
+          <div className="mt-8 flex gap-3 justify-end">
+            <button
+              onClick={onClose}
+              className="px-4 py-2.5 text-sm text-stone-600 border border-stone-300 rounded-lg hover:bg-stone-50 transition-colors cursor-pointer"
+            >
+              取消
+            </button>
+            <button
+              onClick={handleSave}
+              className="px-6 py-2.5 text-sm text-white bg-slate-700 rounded-lg hover:bg-slate-800 transition-colors cursor-pointer"
+            >
+              保存
+            </button>
           </div>
-        </div>
-
-        <div className="mt-6 flex gap-3 justify-end">
-          <button
-            onClick={onClose}
-            className="px-4 py-2 text-sm text-gray-600 border border-gray-300 rounded-lg hover:bg-gray-50 cursor-pointer"
-          >
-            取消
-          </button>
-          <button
-            onClick={handleSave}
-            className="px-4 py-2 text-sm text-white bg-indigo-600 rounded-lg hover:bg-indigo-700 cursor-pointer"
-          >
-            保存
-          </button>
         </div>
       </div>
     </div>
   );
 }
-
-export { loadSettings, saveSettings, DEFAULT_SETTINGS };

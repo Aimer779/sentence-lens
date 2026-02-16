@@ -1,51 +1,75 @@
-import { useState } from 'react';
-import type { TokenAnnotation } from '../types/analysis';
+import { useState, useRef, useEffect } from 'react';
+import type { TokenAnnotation, GrammarRole } from '../types/analysis';
 import { roleColors, posLabels } from '../utils/colors';
 
 interface TooltipData {
   token: TokenAnnotation;
-  x: number;
-  y: number;
+  rect: DOMRect;
 }
 
 interface ColorAnnotationProps {
   tokens: TokenAnnotation[];
   translation: string;
+  disabledRoles?: Set<GrammarRole>;
 }
 
-export default function ColorAnnotation({ tokens, translation }: ColorAnnotationProps) {
+export default function ColorAnnotation({ tokens, translation, disabledRoles }: ColorAnnotationProps) {
   const [tooltip, setTooltip] = useState<TooltipData | null>(null);
+  const tooltipRef = useRef<HTMLDivElement>(null);
+  const containerRef = useRef<HTMLDivElement>(null);
 
   const handleMouseEnter = (token: TokenAnnotation, e: React.MouseEvent) => {
     if (token.role === 'punctuation') return;
     const rect = (e.target as HTMLElement).getBoundingClientRect();
-    setTooltip({ token, x: rect.left + rect.width / 2, y: rect.top });
+    setTooltip({ token, rect });
   };
 
   const handleMouseLeave = () => setTooltip(null);
 
-  return (
-    <div className="bg-white rounded-xl border border-gray-200 p-6">
-      <h2 className="text-lg font-semibold text-gray-900 mb-4">颜色标注</h2>
+  // Adjust tooltip position to stay within viewport
+  useEffect(() => {
+    if (!tooltip || !tooltipRef.current) return;
+    const el = tooltipRef.current;
+    const viewportWidth = window.innerWidth;
+    const elRect = el.getBoundingClientRect();
+    if (elRect.right > viewportWidth - 8) {
+      el.style.left = `${viewportWidth - elRect.width - 8}px`;
+      el.style.transform = 'translateY(0)';
+    }
+    if (elRect.left < 8) {
+      el.style.left = '8px';
+      el.style.transform = 'translateY(0)';
+    }
+  }, [tooltip]);
 
-      {/* Legend */}
-      <div className="flex flex-wrap gap-3 mb-4 text-xs">
-        {Object.entries(roleColors)
-          .filter(([key]) => key !== 'punctuation')
-          .map(([key, val]) => (
-            <span key={key} className={`px-2 py-1 rounded ${val.bg} ${val.text} border ${val.border}`}>
-              {val.label}
-            </span>
-          ))}
-      </div>
+  // Decoration color mapping for wavy underline
+  const getDecorationColor = (role: GrammarRole): string => {
+    const map: Record<string, string> = {
+      subject: 'decoration-rose-400',
+      predicate: 'decoration-emerald-400',
+      object: 'decoration-sky-400',
+      complement: 'decoration-teal-400',
+      attributive: 'decoration-amber-400',
+      adverbial: 'decoration-orange-400',
+      clause: 'decoration-violet-400',
+      connector: 'decoration-stone-400',
+    };
+    return map[role] || 'decoration-stone-400';
+  };
+
+  return (
+    <div className="bg-white rounded-lg shadow-sm p-8" ref={containerRef}>
+      <h2 className="text-lg font-semibold text-stone-800 mb-4">颜色标注</h2>
 
       {/* Annotated sentence */}
-      <div className="leading-relaxed text-lg flex flex-wrap gap-0.5 items-baseline">
+      <div className="font-serif-display text-lg md:text-xl leading-10 tracking-wide flex flex-wrap gap-1 items-baseline">
         {tokens.map((token, i) => {
           const color = roleColors[token.role];
+          const disabled = disabledRoles?.has(token.role);
+
           if (token.role === 'punctuation') {
             return (
-              <span key={i} className="text-gray-500">
+              <span key={i} className="text-stone-400">
                 {token.text}
               </span>
             );
@@ -53,7 +77,9 @@ export default function ColorAnnotation({ tokens, translation }: ColorAnnotation
           return (
             <span
               key={i}
-              className={`px-1.5 py-0.5 rounded cursor-pointer border transition-all hover:shadow-md ${color.bg} ${color.text} ${color.border}`}
+              className={`px-1.5 py-0.5 rounded cursor-pointer transition-all ${color.bg} ${color.text} hover:underline hover:decoration-wavy hover:decoration-2 ${getDecorationColor(token.role)} ${
+                disabled ? 'opacity-30' : ''
+              }`}
               onMouseEnter={(e) => handleMouseEnter(token, e)}
               onMouseLeave={handleMouseLeave}
             >
@@ -64,28 +90,37 @@ export default function ColorAnnotation({ tokens, translation }: ColorAnnotation
       </div>
 
       {/* Translation */}
-      <div className="mt-4 pt-4 border-t border-gray-100">
-        <p className="text-sm text-gray-500 mb-1">中文翻译</p>
-        <p className="text-base text-gray-800">{translation}</p>
+      <div className="mt-6 border-l-4 border-amber-400 pl-4 py-2 bg-amber-50/50 rounded-r-md">
+        <p className="text-sm text-stone-500 mb-1">中文翻译</p>
+        <p className="text-base text-stone-800">{translation}</p>
       </div>
 
-      {/* Floating tooltip */}
+      {/* Tooltip - light annotation card below token */}
       {tooltip && (
         <div
-          className="fixed z-50 bg-gray-900 text-white rounded-lg px-4 py-3 text-sm shadow-xl pointer-events-none"
+          ref={tooltipRef}
+          className="fixed z-50 bg-white rounded-lg shadow-lg border border-stone-200 p-4 pointer-events-none animate-fade-in-up"
           style={{
-            left: tooltip.x,
-            top: tooltip.y - 8,
-            transform: 'translate(-50%, -100%)',
+            left: tooltip.rect.left + tooltip.rect.width / 2,
+            top: tooltip.rect.bottom + 8,
+            transform: 'translateX(-50%)',
+            minWidth: '180px',
           }}
         >
-          <div className="font-medium text-base mb-1">{tooltip.token.text}</div>
-          <div className="flex gap-3 text-xs text-gray-300">
-            <span>词性: {posLabels[tooltip.token.pos] ?? tooltip.token.pos}</span>
-            <span>成分: {roleColors[tooltip.token.role].label}</span>
+          <div className="font-serif-display text-lg font-semibold text-stone-800 mb-2">
+            {tooltip.token.text}
           </div>
-          <div className="mt-1 text-yellow-200">{tooltip.token.meaning}</div>
-          <div className="absolute left-1/2 -translate-x-1/2 top-full w-0 h-0 border-x-[6px] border-x-transparent border-t-[6px] border-t-gray-900" />
+          <div className="grid grid-cols-2 gap-x-4 gap-y-1 text-xs text-stone-500 mb-2">
+            <span>词性</span>
+            <span className="text-stone-700 font-medium">{posLabels[tooltip.token.pos] ?? tooltip.token.pos}</span>
+            <span>成分</span>
+            <span className={`font-medium ${roleColors[tooltip.token.role].text}`}>
+              {roleColors[tooltip.token.role].label}
+            </span>
+          </div>
+          <div className="bg-amber-50 text-amber-800 px-2 py-1 rounded text-sm">
+            {tooltip.token.meaning}
+          </div>
         </div>
       )}
     </div>

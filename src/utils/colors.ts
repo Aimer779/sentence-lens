@@ -1,15 +1,27 @@
 import type { GrammarRole } from '../types/analysis';
 
 export const roleColors: Record<GrammarRole, { bg: string; text: string; border: string; label: string }> = {
-  subject:     { bg: 'bg-red-100',    text: 'text-red-800',    border: 'border-red-300',    label: '主语' },
-  predicate:   { bg: 'bg-green-100',  text: 'text-green-800',  border: 'border-green-300',  label: '谓语' },
-  object:      { bg: 'bg-blue-100',   text: 'text-blue-800',   border: 'border-blue-300',   label: '宾语' },
-  complement:  { bg: 'bg-cyan-100',   text: 'text-cyan-800',   border: 'border-cyan-300',   label: '补语' },
-  attributive: { bg: 'bg-yellow-100', text: 'text-yellow-800', border: 'border-yellow-300', label: '定语' },
-  adverbial:   { bg: 'bg-orange-100', text: 'text-orange-800', border: 'border-orange-300', label: '状语' },
-  clause:      { bg: 'bg-purple-100', text: 'text-purple-800', border: 'border-purple-300', label: '从句' },
-  connector:   { bg: 'bg-gray-100',   text: 'text-gray-600',   border: 'border-gray-300',   label: '连接词' },
-  punctuation: { bg: 'bg-transparent',text: 'text-gray-400',   border: 'border-transparent', label: '标点' },
+  subject:     { bg: 'bg-rose-100',    text: 'text-rose-800',    border: 'border-rose-300',    label: '主语' },
+  predicate:   { bg: 'bg-emerald-100', text: 'text-emerald-800', border: 'border-emerald-300', label: '谓语' },
+  object:      { bg: 'bg-sky-100',     text: 'text-sky-800',     border: 'border-sky-300',     label: '宾语' },
+  complement:  { bg: 'bg-teal-100',    text: 'text-teal-800',    border: 'border-teal-300',    label: '补语' },
+  attributive: { bg: 'bg-amber-100',   text: 'text-amber-800',   border: 'border-amber-300',   label: '定语' },
+  adverbial:   { bg: 'bg-orange-100',  text: 'text-orange-800',  border: 'border-orange-300',  label: '状语' },
+  clause:      { bg: 'bg-violet-100',  text: 'text-violet-800',  border: 'border-violet-300',  label: '从句' },
+  connector:   { bg: 'bg-stone-100',   text: 'text-stone-600',   border: 'border-stone-300',   label: '连接词' },
+  punctuation: { bg: 'bg-transparent', text: 'text-stone-400',   border: 'border-transparent', label: '标点' },
+};
+
+export const roleEnglishLabels: Record<GrammarRole, string> = {
+  subject: 'Subject',
+  predicate: 'Predicate',
+  object: 'Object',
+  complement: 'Complement',
+  attributive: 'Attributive',
+  adverbial: 'Adverbial',
+  clause: 'Clause',
+  connector: 'Connector',
+  punctuation: 'Punctuation',
 };
 
 export const posLabels: Record<string, string> = {
