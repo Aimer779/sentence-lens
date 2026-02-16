@@ -51,13 +51,14 @@ export default function InputPanel({ onAnalyze, loading }: InputPanelProps) {
       </div>
 
       <div className="mt-6">
-        <p className="text-xs text-stone-400 mb-2">示例句子：</p>
-        <div className="flex flex-col gap-1.5">
+        <p className="text-xs font-medium text-stone-500 mb-3 uppercase tracking-wider">示例句子</p>
+        <div className="flex flex-col gap-2">
           {EXAMPLE_SENTENCES.map((ex, i) => (
             <button
               key={i}
               onClick={() => setSentence(ex)}
-              className="text-left font-serif-display text-sm text-stone-500 hover:text-amber-700 px-3 py-2 rounded-md transition-colors line-clamp-1 cursor-pointer hover:bg-amber-50/50"
+              title={ex}
+              className="text-left font-serif-display text-sm leading-6 text-stone-500 hover:text-amber-700 px-3 py-2 rounded-md transition-colors overflow-hidden text-ellipsis whitespace-nowrap cursor-pointer hover:bg-amber-50/50 block w-full"
             >
               <span className="text-stone-400 mr-2">{i + 1}.</span>
               {ex}
