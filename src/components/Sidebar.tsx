@@ -5,13 +5,15 @@ import { roleColors, roleEnglishLabels } from '../utils/colors';
 interface SidebarProps {
   disabledRoles: Set<GrammarRole>;
   onToggleRole: (role: GrammarRole) => void;
+  onToggleAllRoles: () => void;
   onOpenSettings: () => void;
   className?: string;
 }
 
-const ROLES = Object.keys(roleColors).filter((k) => k !== 'punctuation') as GrammarRole[];
+export const ROLES = Object.keys(roleColors).filter((k) => k !== 'punctuation') as GrammarRole[];
 
-export default function Sidebar({ disabledRoles, onToggleRole, onOpenSettings, className = '' }: SidebarProps) {
+export default function Sidebar({ disabledRoles, onToggleRole, onToggleAllRoles, onOpenSettings, className = '' }: SidebarProps) {
+  const allDisabled = disabledRoles.size >= ROLES.length;
   return (
     <aside className={`w-70 bg-white border-r border-stone-200 sticky top-0 h-screen overflow-y-auto p-6 flex flex-col ${className}`}>
       {/* Logo */}
@@ -27,7 +29,15 @@ export default function Sidebar({ disabledRoles, onToggleRole, onOpenSettings, c
 
       {/* Legend & Filter */}
       <div className="flex-1">
-        <h3 className="text-xs font-medium text-stone-400 uppercase tracking-wider mb-3">Grammar Roles</h3>
+        <div className="flex items-center justify-between mb-3">
+          <h3 className="text-xs font-medium text-stone-400 uppercase tracking-wider">Grammar Roles</h3>
+          <button
+            onClick={onToggleAllRoles}
+            className="text-[10px] text-stone-400 hover:text-amber-700 transition-colors cursor-pointer uppercase tracking-wider"
+          >
+            {allDisabled ? 'Show All' : 'Hide All'}
+          </button>
+        </div>
         <div className="space-y-1">
           {ROLES.map((role) => {
             const color = roleColors[role];

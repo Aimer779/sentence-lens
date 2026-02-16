@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { Menu } from 'lucide-react';
 import type { AnalysisResult, ApiSettings, GrammarRole } from './types/analysis';
 import { analyzeSentence } from './services/ai';
-import Sidebar from './components/Sidebar';
+import Sidebar, { ROLES } from './components/Sidebar';
 import InputPanel from './components/InputPanel';
 import ColorAnnotation from './components/ColorAnnotation';
 import TreeView from './components/TreeView';
@@ -48,6 +48,13 @@ export default function App() {
     });
   };
 
+  const handleToggleAllRoles = () => {
+    setDisabledRoles((prev) => {
+      if (prev.size >= ROLES.length) return new Set();
+      return new Set(ROLES);
+    });
+  };
+
   return (
     <div className="min-h-screen bg-stone-50 flex">
       {/* Mobile header */}
@@ -66,6 +73,7 @@ export default function App() {
         <Sidebar
           disabledRoles={disabledRoles}
           onToggleRole={handleToggleRole}
+          onToggleAllRoles={handleToggleAllRoles}
           onOpenSettings={() => setSettingsOpen(true)}
         />
       </div>
@@ -77,6 +85,7 @@ export default function App() {
           <Sidebar
             disabledRoles={disabledRoles}
             onToggleRole={handleToggleRole}
+            onToggleAllRoles={handleToggleAllRoles}
             onOpenSettings={() => { setSettingsOpen(true); setSidebarOpen(false); }}
             className="animate-slide-in-left relative z-10"
           />
