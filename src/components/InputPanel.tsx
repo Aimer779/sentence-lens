@@ -29,12 +29,17 @@ export default function InputPanel({ onAnalyze, loading }: InputPanelProps) {
         value={sentence}
         onChange={(e) => setSentence(e.target.value)}
         placeholder="Type or paste an English sentence here..."
-        className="w-full h-32 md:h-40 px-0 py-3 border-0 border-b-2 border-stone-200 focus:border-amber-500 rounded-none bg-transparent text-lg md:text-xl font-serif-display text-stone-800 resize-none focus:outline-none transition-colors placeholder:text-stone-300"
+        className="w-full h-32 md:h-40 px-4 py-3 border border-stone-200 focus:border-amber-500 rounded-lg bg-stone-50/50 text-lg md:text-xl font-serif-display text-stone-800 resize-none focus:outline-none transition-colors placeholder:text-stone-300"
         onKeyDown={(e) => {
           if (e.key === 'Enter' && (e.ctrlKey || e.metaKey)) handleSubmit();
         }}
       />
-      <div className="mt-4 flex items-center gap-4">
+      <div className="mt-4 flex items-center justify-end gap-4">
+        <span className="text-xs text-stone-400 hidden sm:inline-flex items-center gap-1">
+          <kbd className="px-1.5 py-0.5 bg-stone-100 border border-stone-300 rounded text-[10px] font-mono">Ctrl</kbd>
+          <span>+</span>
+          <kbd className="px-1.5 py-0.5 bg-stone-100 border border-stone-300 rounded text-[10px] font-mono">Enter</kbd>
+        </span>
         <button
           onClick={handleSubmit}
           disabled={loading || !sentence.trim()}
@@ -43,11 +48,6 @@ export default function InputPanel({ onAnalyze, loading }: InputPanelProps) {
           <Send size={16} />
           {loading ? '分析中...' : '分析句子'}
         </button>
-        <span className="text-xs text-stone-400 hidden sm:inline-flex items-center gap-1">
-          <kbd className="px-1.5 py-0.5 bg-stone-100 border border-stone-300 rounded text-[10px] font-mono">Ctrl</kbd>
-          <span>+</span>
-          <kbd className="px-1.5 py-0.5 bg-stone-100 border border-stone-300 rounded text-[10px] font-mono">Enter</kbd>
-        </span>
       </div>
 
       <div className="mt-6">
